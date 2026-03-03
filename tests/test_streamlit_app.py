@@ -51,6 +51,17 @@ class TestLanguageConfiguration:
         assert len(non_english) == 12
         assert non_english == sorted(non_english)
 
+    def test_non_english_can_target_all_other_languages(self, app_module):
+        for source in app_module.LANGUAGES:
+            if source == "English":
+                continue
+            valid_targets = sorted(n for n in app_module.LANGUAGES if n != source)
+            assert "English" in valid_targets, (
+                f"{source} should be able to target English"
+            )
+            assert len(valid_targets) == 12, f"{source} should have 12 targets"
+            assert source not in valid_targets, f"{source} should not target itself"
+
 
 class TestTranslationResult:
     def test_field_access(self, app_module):
