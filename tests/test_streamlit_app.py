@@ -11,15 +11,15 @@ class TestConstants:
 
 
 class TestLanguageConfiguration:
-    def test_languages_has_12_entries(self, app_module):
-        assert len(app_module.LANGUAGES) == 12
+    def test_languages_has_13_entries(self, app_module):
+        assert len(app_module.LANGUAGES) == 13
 
     def test_languages_values_are_str(self, app_module):
         for name, code in app_module.LANGUAGES.items():
             assert isinstance(code, str), f"{name}: expected str value"
 
-    def test_source_langs_has_12_entries(self, app_module):
-        assert len(app_module.SOURCE_LANGS) == 12
+    def test_source_langs_has_13_entries(self, app_module):
+        assert len(app_module.SOURCE_LANGS) == 13
 
     def test_bcp47_codes(self, app_module):
         expected = {
@@ -29,6 +29,7 @@ class TestLanguageConfiguration:
             "French": "fr",
             "German": "de",
             "Indonesian": "id",
+            "Italian": "it",
             "Japanese": "ja",
             "Korean": "ko",
             "Russian": "ru",
@@ -49,7 +50,7 @@ class TestLanguageConfiguration:
 
     def test_english_can_target_all_non_english(self, app_module):
         non_english = sorted(n for n in app_module.LANGUAGES if n != "English")
-        assert len(non_english) == 11
+        assert len(non_english) == 12
         assert non_english == sorted(non_english)
 
 
