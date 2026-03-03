@@ -4,7 +4,7 @@
 
 The TranslateGemma technical report (arxiv 2601.09012) includes MetricX benchmark scores for the 4B model. We are updating the app to support only the bidirectional languages that score well (tiers 1 and 2), plus Japanese by explicit request.
 
-## Language Set (12 total, all bidirectional)
+## Language Set (13 total, all bidirectional)
 
 | Language | Code | Tier | GT 4B MetricX |
 |---|---|---|---|
@@ -14,6 +14,7 @@ The TranslateGemma technical report (arxiv 2601.09012) includes MetricX benchmar
 | French | fr | 1 | 2.97 |
 | German | de | 1 | 1.93 |
 | Indonesian | id | 1 | 2.63 |
+| Italian | it | 1 | 2.78 |
 | Japanese | ja | explicit | 4.44 |
 | Korean | ko | 2 | 3.93 |
 | Russian | ru | 2 | 3.25 |
@@ -31,21 +32,22 @@ Cantonese (yue), Chuukese (chk), Ilocano (ilo), Marshallese (mh), Tonga (to), Fi
 
 - `LANGUAGES: dict[str, tuple[str, bool]]` → `LANGUAGES: dict[str, str]` (name → BCP-47 code)
 - Delete `_build_target_langs()` and `TARGET_LANGS`
-- `SOURCE_LANGS` = sorted list of all 12 languages
+- `SOURCE_LANGS` = sorted list of all 13 languages
 
 ### UI
 
-- Derive valid targets inline: English targets all others sorted; others target English
+- Derive valid targets inline: all languages except the selected source, sorted
 - Swap button always enabled — remove `can_swap` logic
 - Defaults unchanged: source=English, target=Spanish
 
 ### Tests
 
-- `LANGUAGES` count: 15 → 12
+- `LANGUAGES` count: 15 → 13
 - Values are `str` not `tuple` — update type assertions
 - Remove unidirectional tests
-- `SOURCE_LANGS` count: 12 (all languages)
-- English targets: 14 → 11
+- `SOURCE_LANGS` count: 13 (all languages)
+- English targets: 14 → 12
+- Non-English sources target all other languages (12 each)
 - Update BCP-47 code checks for new language set
 - Remove or adapt `TARGET_LANGS`-related tests
 
