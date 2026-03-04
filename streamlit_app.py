@@ -13,6 +13,7 @@ from transformers import AutoModelForImageTextToText, AutoProcessor
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
+logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 MODEL_ID = "google/translategemma-4b-it"
