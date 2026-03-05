@@ -48,20 +48,6 @@ class TranslationResult:
     eval_duration: int
 
 
-@dataclass(frozen=True)
-class HistoryEntry:
-    mode: str
-    source_lang: str
-    source_code: str
-    target_langs: list[str]
-    target_codes: list[str]
-    source_text: str
-    results: list[TranslationResult]
-    total_duration: int
-    load_duration: int
-    timestamp: str
-
-
 def compute_tokens_per_sec(eval_count: int, eval_duration: int) -> float:
     if eval_duration == 0 or eval_count == 0:
         return 0.0
@@ -215,14 +201,19 @@ def translate_multi(
 st.set_page_config(page_title="Translation Pipeline", page_icon="\U0001f310")
 st.title("Translation Pipeline")
 
+# --- Session state defaults ---
+if "source_lang" not in st.session_state:
+    st.session_state["source_lang"] = "English"
+if "target_lang" not in st.session_state:
+    st.session_state["target_lang"] = "Spanish"
+if "history" not in st.session_state:
+    st.session_state["history"] = []
+
 # --- Sidebar ---
 with st.sidebar:
     st.header("Translation Pipeline")
     st.caption(f"Model: {MODEL_ID}")
     st.divider()
-
-    if "history" not in st.session_state:
-        st.session_state["history"] = []
 
     history: list[dict[str, Any]] = st.session_state["history"]
 
@@ -258,6 +249,22 @@ with st.sidebar:
                     st.session_state["total_duration"] = entry["total_duration"]
                     st.session_state["load_duration"] = entry["load_duration"]
                     st.session_state["active_mode"] = "image"
+                elif len(entry["results"]) > 1:
+                    st.session_state["multi_pair_results"] = [
+                        {
+                            "target_lang": lang,
+                            "target_code": code,
+                            "result": result,
+                        }
+                        for lang, code, result in zip(
+                            entry["target_langs"],
+                            entry["target_codes"],
+                            entry["results"],
+                        )
+                    ]
+                    st.session_state["total_duration"] = entry["total_duration"]
+                    st.session_state["load_duration"] = entry["load_duration"]
+                    st.session_state["active_mode"] = "multi"
                 st.rerun()
 
         st.divider()
@@ -289,14 +296,6 @@ except Exception as e:
     logger.exception("Failed to load model")
     st.error(f"Failed to load model: {e}")
     st.stop()
-
-# --- Session state defaults ---
-if "source_lang" not in st.session_state:
-    st.session_state["source_lang"] = "English"
-if "target_lang" not in st.session_state:
-    st.session_state["target_lang"] = "Spanish"
-if "history" not in st.session_state:
-    st.session_state["history"] = []
 
 
 def _swap_languages() -> None:
@@ -334,17 +333,9 @@ with col_swap:
         on_click=_swap_languages,
     )
 
-# --- Multi-pair toggle (text mode only) ---
-multi_pair = st.checkbox("Translate to multiple languages", key="multi_pair_mode")
-
-if multi_pair:
-    selected_targets = st.multiselect(
-        "Target languages",
-        sorted(n for n in LANGUAGES if n != source),
-        key="selected_targets",
-    )
-else:
-    selected_targets = [target]
+# --- Multi-pair defaults ---
+multi_pair = False
+selected_targets = [target]
 
 # --- Tabs for text and image input ---
 uploaded_file = None
@@ -353,6 +344,16 @@ text_tab, image_tab = st.tabs(["Text", "Image"])
 
 # --- Text tab ---
 with text_tab:
+    multi_pair = st.checkbox("Translate to multiple languages", key="multi_pair_mode")
+    if multi_pair:
+        selected_targets = st.multiselect(
+            "Target languages",
+            sorted(n for n in LANGUAGES if n != source),
+            key="selected_targets",
+        )
+    else:
+        selected_targets = [target]
+
     left_col, right_col = st.columns(2)
 
     with left_col:
@@ -365,7 +366,6 @@ with text_tab:
         translate_text_clicked = st.button(
             "Translate", type="primary", use_container_width=True, key="translate_text"
         )
-        st.caption("Ctrl+Enter to translate")
 
     prev_response = (
         st.session_state["translation_result"].response
@@ -487,6 +487,7 @@ if translate_text_clicked:
                 )
 
             st.session_state["translation_result"] = result
+            st.session_state["source_text_for_metrics"] = text
             st.session_state["total_duration"] = total_duration
             st.session_state["load_duration"] = load_duration
             st.session_state["active_mode"] = "text"
@@ -599,9 +600,10 @@ if active_result is not None and active_mode in ("text", "image"):
 
     # Add character ratio for text mode
     if active_mode == "text" and "translation_result" in st.session_state:
-        source_text = text if text else ""
+        source_text = st.session_state.get("source_text_for_metrics", "")
         char_ratio = compute_char_ratio(source_text, active_result.response)
         metrics.append(("Char Ratio (tgt/src)", f"{char_ratio:.2f}"))
+        data["char_ratio"] = round(char_ratio, 4)
 
     with st.expander("Performance details"):
         st.caption(f"Model: {MODEL_ID}")
