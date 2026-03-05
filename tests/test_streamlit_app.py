@@ -9,6 +9,9 @@ class TestConstants:
     def test_max_new_tokens(self, app_module):
         assert app_module.MAX_NEW_TOKENS == 512
 
+    def test_accepted_image_types(self, app_module):
+        assert app_module.ACCEPTED_IMAGE_TYPES == ["png", "jpg", "jpeg", "webp"]
+
 
 class TestLanguageConfiguration:
     def test_languages_has_9_entries(self, app_module):

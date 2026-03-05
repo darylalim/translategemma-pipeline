@@ -5,6 +5,8 @@ import time
 from dataclasses import asdict, dataclass
 from typing import Any
 
+from PIL import Image
+
 import streamlit as st
 import torch
 from dotenv import load_dotenv
@@ -18,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 MODEL_ID = "google/translategemma-4b-it"
 MAX_NEW_TOKENS = 512
+ACCEPTED_IMAGE_TYPES: list[str] = ["png", "jpg", "jpeg", "webp"]
 
 LANGUAGES: dict[str, str] = {
     "English": "en",
