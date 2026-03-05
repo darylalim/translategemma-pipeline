@@ -282,7 +282,7 @@ with image_tab:
         )
         if uploaded_file is not None:
             image = Image.open(uploaded_file)
-            st.image(image, use_container_width=True)
+            st.image(image, width="stretch")
         translate_image_clicked = st.button(
             "Translate", type="primary", use_container_width=True, key="translate_image"
         )
