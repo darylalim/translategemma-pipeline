@@ -558,16 +558,22 @@ elif active_mode == "text":
 else:
     active_result = None
 
-if active_result is not None:
+if active_result is not None and active_mode in ("text", "image"):
     total_duration = st.session_state["total_duration"]
     load_duration = st.session_state["load_duration"]
+
+    tok_sec = compute_tokens_per_sec(
+        active_result.eval_count, active_result.eval_duration
+    )
 
     data = {
         "model": MODEL_ID,
         "total_duration": total_duration,
         "load_duration": load_duration,
+        "tokens_per_sec": round(tok_sec, 2),
         **asdict(active_result),
     }
+
     metrics = [
         ("Total Time", f"{total_duration / 1e9:.2f}s"),
         ("Model Load Time", f"{load_duration / 1e9:.2f}s"),
@@ -575,7 +581,14 @@ if active_result is not None:
         ("Input Processing Time", f"{active_result.prompt_eval_duration / 1e9:.2f}s"),
         ("Output Tokens", active_result.eval_count),
         ("Generation Time", f"{active_result.eval_duration / 1e9:.2f}s"),
+        ("Tokens/sec", f"{tok_sec:.1f}"),
     ]
+
+    # Add character ratio for text mode
+    if active_mode == "text" and "translation_result" in st.session_state:
+        source_text = text if text else ""
+        char_ratio = compute_char_ratio(source_text, active_result.response)
+        metrics.append(("Char Ratio (tgt/src)", f"{char_ratio:.2f}"))
 
     with st.expander("Performance details"):
         st.caption(f"Model: {MODEL_ID}")
