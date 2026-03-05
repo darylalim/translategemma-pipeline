@@ -268,6 +268,7 @@ class TestTranslateImage:
         mock_image = MagicMock()
         patched_translate_image["translate_image"](mock_image, "en", "es")
         call_kwargs = patched_translate_image["processor"].apply_chat_template.call_args[1]
+        assert call_kwargs["images"] == [mock_image]
         assert call_kwargs["tokenize"] is True
         assert call_kwargs["add_generation_prompt"] is True
         assert call_kwargs["return_dict"] is True
@@ -288,7 +289,8 @@ class TestTranslateImage:
     def test_inputs_moved_to_model_device(self, patched_translate_image):
         mock_image = MagicMock()
         patched_translate_image["translate_image"](mock_image, "en", "es")
-        patched_translate_image["processor"].apply_chat_template.return_value.to.assert_called()
+        call_args = patched_translate_image["processor"].apply_chat_template.return_value.to.call_args
+        assert call_args[0][0] == "cpu"
 
     def test_generate_called_with_correct_args(self, patched_translate_image):
         mock_image = MagicMock()
