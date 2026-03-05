@@ -1512,6 +1512,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "accelerate" },
+    { name = "pillow" },
     { name = "python-dotenv" },
     { name = "streamlit" },
     { name = "torch" },
@@ -1528,6 +1529,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "accelerate" },
+    { name = "pillow" },
     { name = "python-dotenv" },
     { name = "streamlit" },
     { name = "torch" },
