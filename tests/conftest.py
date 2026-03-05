@@ -22,9 +22,9 @@ def app_module():
     img_left_col, img_right_col = MagicMock(), MagicMock()
 
     mock_st.columns.side_effect = [
-        (col1, col_swap, col2),       # language selectors
+        (col1, col_swap, col2),  # language selectors
         (text_left_col, text_right_col),  # text tab
-        (img_left_col, img_right_col),    # image tab
+        (img_left_col, img_right_col),  # image tab
     ]
     mock_st.button.return_value = False
 

@@ -47,6 +47,20 @@ class TranslationResult:
     eval_duration: int
 
 
+@dataclass(frozen=True)
+class HistoryEntry:
+    mode: str
+    source_lang: str
+    source_code: str
+    target_langs: list[str]
+    target_codes: list[str]
+    source_text: str
+    results: list[TranslationResult]
+    total_duration: int
+    load_duration: int
+    timestamp: str
+
+
 def build_prompt(
     text: str,
     src_lang: str,

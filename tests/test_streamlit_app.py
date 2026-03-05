@@ -264,10 +264,14 @@ class TestTranslateImage:
         result = patched_translate_image["translate_image"](mock_image, "en", "es")
         assert result.response == "translated text"
 
-    def test_apply_chat_template_called_with_correct_args(self, patched_translate_image):
+    def test_apply_chat_template_called_with_correct_args(
+        self, patched_translate_image
+    ):
         mock_image = MagicMock()
         patched_translate_image["translate_image"](mock_image, "en", "es")
-        call_kwargs = patched_translate_image["processor"].apply_chat_template.call_args[1]
+        call_kwargs = patched_translate_image[
+            "processor"
+        ].apply_chat_template.call_args[1]
         assert "images" not in call_kwargs
         assert call_kwargs["tokenize"] is True
         assert call_kwargs["add_generation_prompt"] is True
@@ -277,7 +281,9 @@ class TestTranslateImage:
     def test_apply_chat_template_message_format(self, patched_translate_image):
         mock_image = MagicMock()
         patched_translate_image["translate_image"](mock_image, "en", "de")
-        call_args = patched_translate_image["processor"].apply_chat_template.call_args[0]
+        call_args = patched_translate_image["processor"].apply_chat_template.call_args[
+            0
+        ]
         messages = call_args[0]
         assert len(messages) == 1
         assert messages[0]["role"] == "user"
@@ -289,7 +295,9 @@ class TestTranslateImage:
     def test_inputs_moved_to_model_device(self, patched_translate_image):
         mock_image = MagicMock()
         patched_translate_image["translate_image"](mock_image, "en", "es")
-        call_args = patched_translate_image["processor"].apply_chat_template.return_value.to.call_args
+        call_args = patched_translate_image[
+            "processor"
+        ].apply_chat_template.return_value.to.call_args
         assert call_args[0][0] == "cpu"
 
     def test_generate_called_with_correct_args(self, patched_translate_image):
@@ -331,6 +339,99 @@ class TestTranslateImage:
         mock_image = MagicMock()
         patched_translate_image["translate_image"](mock_image, "en", "es")
         assert patched_translate_image["model"].generate.call_count == 1
+
+
+class TestHistoryEntry:
+    def test_is_dataclass(self, app_module):
+        assert is_dataclass(app_module.HistoryEntry)
+
+    def test_text_entry_fields(self, app_module):
+        result = app_module.TranslationResult(
+            response="hola",
+            prompt_eval_count=10,
+            prompt_eval_duration=100,
+            eval_count=5,
+            eval_duration=200,
+        )
+        entry = app_module.HistoryEntry(
+            mode="text",
+            source_lang="English",
+            source_code="en",
+            target_langs=["Spanish"],
+            target_codes=["es"],
+            source_text="hello",
+            results=[result],
+            total_duration=1000,
+            load_duration=500,
+            timestamp="2026-03-05T12:00:00",
+        )
+        assert entry.mode == "text"
+        assert entry.source_lang == "English"
+        assert entry.source_code == "en"
+        assert entry.target_langs == ["Spanish"]
+        assert entry.target_codes == ["es"]
+        assert entry.source_text == "hello"
+        assert entry.results == [result]
+        assert entry.total_duration == 1000
+        assert entry.load_duration == 500
+        assert entry.timestamp == "2026-03-05T12:00:00"
+
+    def test_multi_pair_entry_fields(self, app_module):
+        results = [
+            app_module.TranslationResult("hola", 10, 100, 5, 200),
+            app_module.TranslationResult("bonjour", 10, 100, 7, 300),
+        ]
+        entry = app_module.HistoryEntry(
+            mode="text",
+            source_lang="English",
+            source_code="en",
+            target_langs=["Spanish", "French"],
+            target_codes=["es", "fr"],
+            source_text="hello",
+            results=results,
+            total_duration=2000,
+            load_duration=500,
+            timestamp="2026-03-05T12:00:00",
+        )
+        assert len(entry.results) == 2
+        assert entry.target_langs == ["Spanish", "French"]
+
+    def test_image_entry_source_text_is_filename(self, app_module):
+        result = app_module.TranslationResult("hola", 266, 100, 5, 200)
+        entry = app_module.HistoryEntry(
+            mode="image",
+            source_lang="English",
+            source_code="en",
+            target_langs=["Spanish"],
+            target_codes=["es"],
+            source_text="photo.png",
+            results=[result],
+            total_duration=1000,
+            load_duration=500,
+            timestamp="2026-03-05T12:00:00",
+        )
+        assert entry.mode == "image"
+        assert entry.source_text == "photo.png"
+
+    def test_asdict(self, app_module):
+        result = app_module.TranslationResult("hola", 10, 100, 5, 200)
+        entry = app_module.HistoryEntry(
+            mode="text",
+            source_lang="English",
+            source_code="en",
+            target_langs=["Spanish"],
+            target_codes=["es"],
+            source_text="hello",
+            results=[result],
+            total_duration=1000,
+            load_duration=500,
+            timestamp="2026-03-05T12:00:00",
+        )
+        d = asdict(entry)
+        assert d["mode"] == "text"
+        assert d["source_lang"] == "English"
+        assert len(d["results"]) == 1
+        assert d["results"][0]["response"] == "hola"
 
 
 class TestLoadModel:
