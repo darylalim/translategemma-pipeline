@@ -23,11 +23,13 @@ def app_module():
 
     # First call: language selectors [5, 1, 5] -> 3 columns
     # Subsequent calls: return appropriate number of MagicMock columns
-    _columns_calls = iter([
-        (col1, col_swap, col2),       # language selectors
-        (text_left_col, text_right_col),  # text tab
-        (img_left_col, img_right_col),    # image tab
-    ])
+    _columns_calls = iter(
+        [
+            (col1, col_swap, col2),  # language selectors
+            (text_left_col, text_right_col),  # text tab
+            (img_left_col, img_right_col),  # image tab
+        ]
+    )
 
     def _mock_columns(*args, **kwargs):
         try:

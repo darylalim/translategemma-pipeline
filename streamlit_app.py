@@ -3,6 +3,7 @@ import logging
 import os
 import time
 from dataclasses import asdict, dataclass
+from datetime import datetime
 from typing import Any
 
 from PIL import Image
@@ -214,6 +215,67 @@ def translate_multi(
 st.set_page_config(page_title="Translation Pipeline", page_icon="\U0001f310")
 st.title("Translation Pipeline")
 
+# --- Sidebar ---
+with st.sidebar:
+    st.header("Translation Pipeline")
+    st.caption(f"Model: {MODEL_ID}")
+    st.divider()
+
+    if "history" not in st.session_state:
+        st.session_state["history"] = []
+
+    history: list[dict[str, Any]] = st.session_state["history"]
+
+    if history:
+        st.subheader("History")
+        for i, entry in enumerate(reversed(history)):
+            idx = len(history) - 1 - i
+            targets = ", ".join(entry["target_codes"]).upper()
+            label = f"{entry['source_code'].upper()} \u2192 {targets}"
+            preview = entry["source_text"][:40]
+            if len(entry["source_text"]) > 40:
+                preview += "..."
+            icon = "\U0001f5bc\ufe0f" if entry["mode"] == "image" else "\U0001f4dd"
+            if st.button(
+                f"{icon} {label}: {preview}",
+                key=f"history_{idx}",
+                use_container_width=True,
+            ):
+                st.session_state["source_lang"] = entry["source_lang"]
+                if len(entry["target_langs"]) == 1:
+                    st.session_state["target_lang"] = entry["target_langs"][0]
+                if entry["mode"] == "text" and len(entry["results"]) == 1:
+                    st.session_state["translation_result"] = TranslationResult(
+                        **entry["results"][0]
+                    )
+                    st.session_state["total_duration"] = entry["total_duration"]
+                    st.session_state["load_duration"] = entry["load_duration"]
+                    st.session_state["active_mode"] = "text"
+                elif entry["mode"] == "image" and len(entry["results"]) == 1:
+                    st.session_state["image_translation_result"] = TranslationResult(
+                        **entry["results"][0]
+                    )
+                    st.session_state["total_duration"] = entry["total_duration"]
+                    st.session_state["load_duration"] = entry["load_duration"]
+                    st.session_state["active_mode"] = "image"
+                st.rerun()
+
+        st.divider()
+        col_clear, col_export = st.columns(2)
+        with col_clear:
+            if st.button("Clear", use_container_width=True):
+                st.session_state["history"] = []
+                st.rerun()
+        with col_export:
+            st.download_button(
+                "Export JSON",
+                json.dumps(history, indent=2),
+                "history.json",
+                use_container_width=True,
+            )
+    else:
+        st.caption("No translations yet. Results will appear here.")
+
 # --- Token check ---
 if not os.environ.get("HF_TOKEN"):
     st.error("HF_TOKEN not found. Add it to your `.env` file.")
@@ -233,6 +295,8 @@ if "source_lang" not in st.session_state:
     st.session_state["source_lang"] = "English"
 if "target_lang" not in st.session_state:
     st.session_state["target_lang"] = "Spanish"
+if "history" not in st.session_state:
+    st.session_state["history"] = []
 
 
 def _swap_languages() -> None:
@@ -359,6 +423,20 @@ if translate_text_clicked:
             st.session_state["total_duration"] = total_duration
             st.session_state["load_duration"] = load_duration
             st.session_state["active_mode"] = "text"
+            st.session_state["history"].append(
+                {
+                    "mode": "text",
+                    "source_lang": source,
+                    "source_code": LANGUAGES[source],
+                    "target_langs": [target],
+                    "target_codes": [LANGUAGES[target]],
+                    "source_text": text,
+                    "results": [asdict(result)],
+                    "total_duration": total_duration,
+                    "load_duration": load_duration,
+                    "timestamp": datetime.now().isoformat(),
+                }
+            )
             st.rerun()
         except Exception as e:
             logger.exception("Translation failed")
@@ -389,6 +467,21 @@ if translate_image_clicked:
             st.session_state["total_duration"] = total_duration
             st.session_state["load_duration"] = load_duration
             st.session_state["active_mode"] = "image"
+            filename = uploaded_file.name if uploaded_file else "image"
+            st.session_state["history"].append(
+                {
+                    "mode": "image",
+                    "source_lang": source,
+                    "source_code": LANGUAGES[source],
+                    "target_langs": [target],
+                    "target_codes": [LANGUAGES[target]],
+                    "source_text": filename,
+                    "results": [asdict(result)],
+                    "total_duration": total_duration,
+                    "load_duration": load_duration,
+                    "timestamp": datetime.now().isoformat(),
+                }
+            )
             st.rerun()
         except Exception as e:
             logger.exception("Image translation failed")
