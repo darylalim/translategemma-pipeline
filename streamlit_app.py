@@ -197,6 +197,20 @@ def translate_image(
     )
 
 
+def translate_multi(
+    text: str,
+    src_lang: str,
+    src_code: str,
+    tgt_langs: list[str],
+    tgt_codes: list[str],
+) -> list[tuple[str, str, TranslationResult]]:
+    results: list[tuple[str, str, TranslationResult]] = []
+    for tgt_lang, tgt_code in zip(tgt_langs, tgt_codes):
+        result = translate(text, src_lang, src_code, tgt_lang, tgt_code)
+        results.append((tgt_lang, tgt_code, result))
+    return results
+
+
 st.set_page_config(page_title="Translation Pipeline", page_icon="\U0001f310")
 st.title("Translation Pipeline")
 

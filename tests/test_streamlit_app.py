@@ -341,6 +341,56 @@ class TestTranslateImage:
         assert patched_translate_image["model"].generate.call_count == 1
 
 
+class TestTranslateMulti:
+    def test_returns_list_of_tuples(self, patched_translate_multi):
+        results = patched_translate_multi["translate_multi"](
+            "Hello",
+            "English",
+            "en",
+            ["Spanish", "French"],
+            ["es", "fr"],
+        )
+        assert isinstance(results, list)
+        assert len(results) == 2
+
+    def test_tuple_structure(self, app_module, patched_translate_multi):
+        results = patched_translate_multi["translate_multi"](
+            "Hello",
+            "English",
+            "en",
+            ["Spanish"],
+            ["es"],
+        )
+        lang, code, result = results[0]
+        assert lang == "Spanish"
+        assert code == "es"
+        assert isinstance(result, app_module.TranslationResult)
+
+    def test_calls_translate_for_each_target(self, patched_translate_multi):
+        patched_translate_multi["translate_multi"](
+            "Hello",
+            "English",
+            "en",
+            ["Spanish", "French", "German"],
+            ["es", "fr", "de"],
+        )
+        # generate is called once per target language
+        assert patched_translate_multi["model"].generate.call_count == 3
+
+    def test_empty_targets_returns_empty(self, patched_translate_multi):
+        results = patched_translate_multi["translate_multi"](
+            "Hello", "English", "en", [], []
+        )
+        assert results == []
+
+    def test_response_is_stripped(self, patched_translate_multi):
+        results = patched_translate_multi["translate_multi"](
+            "Hello", "English", "en", ["Spanish"], ["es"]
+        )
+        _, _, result = results[0]
+        assert result.response == "translated text"
+
+
 class TestHistoryEntry:
     def test_is_dataclass(self, app_module):
         assert is_dataclass(app_module.HistoryEntry)

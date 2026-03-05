@@ -156,3 +156,19 @@ def patched_translate_image(app_module, mock_model, mock_processor_image):
             "model": mock_model,
             "processor": mock_processor_image,
         }
+
+
+@pytest.fixture()
+def patched_translate_multi(app_module, mock_model, mock_processor):
+    """Patch load_model for multi-pair translation tests."""
+    with patch.object(
+        app_module,
+        "load_model",
+        return_value=(mock_model, mock_processor, 107, 5_000_000),
+    ):
+        yield {
+            "translate_multi": app_module.translate_multi,
+            "translate": app_module.translate,
+            "model": mock_model,
+            "processor": mock_processor,
+        }
