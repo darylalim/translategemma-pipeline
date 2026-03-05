@@ -237,6 +237,8 @@ with col_swap:
     )
 
 # --- Tabs for text and image input ---
+uploaded_file = None
+image = None
 text_tab, image_tab = st.tabs(["Text", "Image"])
 
 # --- Text tab ---
@@ -328,6 +330,7 @@ if translate_text_clicked:
             st.session_state["translation_result"] = result
             st.session_state["total_duration"] = total_duration
             st.session_state["load_duration"] = load_duration
+            st.session_state["active_mode"] = "text"
             st.rerun()
         except Exception as e:
             logger.exception("Translation failed")
@@ -357,17 +360,20 @@ if translate_image_clicked:
             st.session_state["image_translation_result"] = result
             st.session_state["total_duration"] = total_duration
             st.session_state["load_duration"] = load_duration
+            st.session_state["active_mode"] = "image"
             st.rerun()
         except Exception as e:
             logger.exception("Image translation failed")
             st.error(f"Image translation failed: {e}")
 
 # --- Metrics in expander ---
-active_result = None
-if "image_translation_result" in st.session_state:
-    active_result = st.session_state["image_translation_result"]
-if "translation_result" in st.session_state:
-    active_result = st.session_state["translation_result"]
+active_mode = st.session_state.get("active_mode")
+if active_mode == "image":
+    active_result = st.session_state.get("image_translation_result")
+elif active_mode == "text":
+    active_result = st.session_state.get("translation_result")
+else:
+    active_result = None
 
 if active_result is not None:
     total_duration = st.session_state["total_duration"]
