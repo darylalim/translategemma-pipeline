@@ -6,11 +6,10 @@ from dataclasses import asdict, dataclass
 from datetime import datetime
 from typing import Any
 
-from PIL import Image
-
 import streamlit as st
 import torch
 from dotenv import load_dotenv
+from PIL import Image
 from transformers import AutoModelForImageTextToText, AutoProcessor
 
 load_dotenv()
