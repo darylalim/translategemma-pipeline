@@ -1539,7 +1539,7 @@ wheels = [
 ]
 
 [[package]]
-name = "translation-pipeline"
+name = "translategemma-pipeline"
 version = "0.2.0"
 source = { virtual = "." }
 dependencies = [
