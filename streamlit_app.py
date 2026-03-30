@@ -275,28 +275,14 @@ with text_tab:
             st.warning("Please enter text to translate.")
         else:
             try:
-                with st.status("Translating...", expanded=True) as status:
-                    st.write("Tokenizing input...")
-                    t0 = time.perf_counter_ns()
-                    result = translate(
-                        text,
-                        source,
-                        LANGUAGES[source],
-                        target,
-                        LANGUAGES[target],
-                    )
-                    total_duration = time.perf_counter_ns() - t0
-                    status.update(
-                        label=f"Translated in {total_duration / 1e9:.2f}s",
-                        state="complete",
-                        expanded=False,
-                    )
-
-                st.session_state["translation_result"] = result
-                st.toast(
-                    f"{LANGUAGES[source].upper()} \u2192 {LANGUAGES[target].upper()} "
-                    f"translated in {total_duration / 1e9:.1f}s"
+                result = translate(
+                    text,
+                    source,
+                    LANGUAGES[source],
+                    target,
+                    LANGUAGES[target],
                 )
+                st.session_state["translation_result"] = result
                 st.rerun()
             except Exception as e:
                 logger.exception("Translation failed")
@@ -373,26 +359,12 @@ with image_tab:
             st.warning("Please upload an image to translate.")
         else:
             try:
-                with st.status("Translating image...", expanded=True) as status:
-                    st.write("Processing image and tokenizing...")
-                    t0 = time.perf_counter_ns()
-                    result = translate_image(
-                        image,
-                        LANGUAGES[source],
-                        LANGUAGES[target],
-                    )
-                    total_duration = time.perf_counter_ns() - t0
-                    status.update(
-                        label=f"Translated in {total_duration / 1e9:.2f}s",
-                        state="complete",
-                        expanded=False,
-                    )
-
-                st.session_state["image_translation_result"] = result
-                st.toast(
-                    f"Image {LANGUAGES[source].upper()} \u2192 {LANGUAGES[target].upper()} "
-                    f"translated in {total_duration / 1e9:.1f}s"
+                result = translate_image(
+                    image,
+                    LANGUAGES[source],
+                    LANGUAGES[target],
                 )
+                st.session_state["image_translation_result"] = result
                 st.rerun()
             except Exception as e:
                 logger.exception("Image translation failed")
