@@ -277,9 +277,9 @@ with text_tab:
     )
 
     with right_col:
+        st.session_state["text_output"] = prev_response
         st.text_area(
             "Translation output",
-            value=prev_response,
             placeholder="Translation",
             disabled=True,
             height=200,
@@ -390,9 +390,9 @@ with image_tab:
     )
 
     with right_col:
+        st.session_state["image_output"] = prev_image_response
         st.text_area(
             "Translation output",
-            value=prev_image_response,
             placeholder="Translation",
             disabled=True,
             height=200,
