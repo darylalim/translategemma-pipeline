@@ -63,19 +63,19 @@ Input images are normalized to 896x896 resolution and encoded to 256 tokens each
 
 Accepted image types: PNG, JPG, JPEG, WEBP.
 
-### Metric Helpers
-
-- `word_count(text)` — returns word count via `split()`, 0 for empty/whitespace
-
 ### UI
 
 - Input mode: `st.tabs(["Text", "Image"])` — tabs appear first, language selectors are inside each tab
 - Language selectors: 3-column `[5, 1, 5]` layout with swap button in the middle, inside each tab
 - Language state shared between tabs via canonical `source_lang`/`target_lang` session state with tab-specific widget keys synced via `on_change` callbacks
-- Text tab: 2-column side-by-side; `st.text_area` for input with word/character count, `st.container(border=True)` + `st.markdown` for output
-- Image tab: `st.file_uploader` + `st.image` preview (left), `st.container(border=True)` + `st.markdown` output (right)
-- **Toast notifications**: `st.toast` on successful translation with language pair and timing
-- `st.session_state` keys: `source_lang`, `target_lang`, `translation_result`, `image_translation_result`
+- Text tab: 2-column side-by-side; `st.text_area` (no placeholder, `max_chars=5000`) for input, disabled `st.text_area` (placeholder "Translation") for output
+- Below text input: clear button (`:material/close:` icon, left), character count number (right)
+- Below text/image output: copy button (`:material/content_copy:` icon), download button (`:material/download:` icon), right-aligned
+- Image tab: `st.file_uploader` + caption for supported types + `st.image` preview (left), disabled `st.text_area` output (right)
+- Translate button: auto-width, left-aligned (both tabs)
+- Copy uses `streamlit.components.v1.html` with JS clipboard API
+- Download uses `st.download_button` with `mime="text/plain"`
+- `st.session_state` keys: `source_lang`, `target_lang`, `translation_result`, `image_translation_result`, `source_text`
 - `st.session_state` keys (tab-specific widget keys): `text_source_lang`, `text_target_lang`, `image_source_lang`, `image_target_lang`
 
 ## Known Issues
