@@ -366,6 +366,7 @@ with image_tab:
             "Upload an image",
             type=ACCEPTED_IMAGE_TYPES,
         )
+        st.caption("Supported file types: .jpg, .jpeg, .png, .webp.")
         image = None
         if uploaded_file is not None:
             image = Image.open(uploaded_file)
@@ -373,7 +374,6 @@ with image_tab:
         translate_image_clicked = st.button(
             "Translate",
             type="primary",
-            use_container_width=True,
             key="translate_image",
         )
 
@@ -384,11 +384,34 @@ with image_tab:
     )
 
     with right_col:
-        with st.container(border=True):
-            if prev_image_response:
-                st.markdown(prev_image_response)
-            else:
-                st.caption("Upload an image and click Translate to see results.")
+        st.text_area(
+            "Translation output",
+            value=prev_image_response,
+            placeholder="Translation",
+            disabled=True,
+            height=200,
+            label_visibility="collapsed",
+            key="image_output",
+        )
+        _, copy_col, download_col = st.columns([8, 1, 1])
+        with copy_col:
+            if st.button(":material/content_copy:", key="copy_image"):
+                if prev_image_response:
+                    components.html(
+                        "<script>"
+                        "window.parent.navigator.clipboard.writeText("
+                        f"{json.dumps(prev_image_response)});"
+                        "</script>",
+                        height=0,
+                    )
+        with download_col:
+            st.download_button(
+                label=":material/download:",
+                data=prev_image_response or "",
+                file_name="translation.txt",
+                mime="text/plain",
+                key="download_image",
+            )
 
     if translate_image_clicked:
         if image is None:

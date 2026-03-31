@@ -26,6 +26,11 @@ def app_module():
     )
     # Image tab columns
     img_left_col, img_right_col = MagicMock(), MagicMock()
+    img_spacer_col, img_copy_col, img_download_col = (
+        MagicMock(),
+        MagicMock(),
+        MagicMock(),
+    )
 
     # Column calls (language selectors inside each tab now):
     # 1. Text tab language selectors [5, 1, 5]
@@ -34,6 +39,7 @@ def app_module():
     # 4. Text tab copy/download [8, 1, 1]
     # 5. Image tab language selectors [5, 1, 5]
     # 6. Image tab content [2]
+    # 7. Image tab copy/download [8, 1, 1]
     _columns_calls = iter(
         [
             (col1, col_swap, col2),
@@ -42,6 +48,7 @@ def app_module():
             (text_spacer_col, text_copy_col, text_download_col),
             (col1, col_swap, col2),
             (img_left_col, img_right_col),
+            (img_spacer_col, img_copy_col, img_download_col),
         ]
     )
 
