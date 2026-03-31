@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import time
@@ -5,6 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import streamlit as st
+import streamlit.components.v1 as components
 import torch
 from dotenv import load_dotenv
 from PIL import Image
@@ -275,11 +277,34 @@ with text_tab:
     )
 
     with right_col:
-        with st.container(border=True):
-            if prev_response:
-                st.markdown(prev_response)
-            else:
-                st.caption("Enter text and click Translate to see results.")
+        st.text_area(
+            "Translation output",
+            value=prev_response,
+            placeholder="Translation",
+            disabled=True,
+            height=200,
+            label_visibility="collapsed",
+            key="text_output",
+        )
+        _, copy_col, download_col = st.columns([8, 1, 1])
+        with copy_col:
+            if st.button(":material/content_copy:", key="copy_text"):
+                if prev_response:
+                    components.html(
+                        "<script>"
+                        "window.parent.navigator.clipboard.writeText("
+                        f"{json.dumps(prev_response)});"
+                        "</script>",
+                        height=0,
+                    )
+        with download_col:
+            st.download_button(
+                label=":material/download:",
+                data=prev_response or "",
+                file_name="translation.txt",
+                mime="text/plain",
+                key="download_text",
+            )
 
     if translate_text_clicked:
         if not text.strip():

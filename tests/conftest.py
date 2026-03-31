@@ -19,6 +19,11 @@ def app_module():
     # Text tab columns
     text_left_col, text_right_col = MagicMock(), MagicMock()
     text_clear_col, text_count_col = MagicMock(), MagicMock()
+    text_spacer_col, text_copy_col, text_download_col = (
+        MagicMock(),
+        MagicMock(),
+        MagicMock(),
+    )
     # Image tab columns
     img_left_col, img_right_col = MagicMock(), MagicMock()
 
@@ -26,13 +31,15 @@ def app_module():
     # 1. Text tab language selectors [5, 1, 5]
     # 2. Text tab content [2]
     # 3. Text tab clear/count [2]
-    # 4. Image tab language selectors [5, 1, 5]
-    # 5. Image tab content [2]
+    # 4. Text tab copy/download [8, 1, 1]
+    # 5. Image tab language selectors [5, 1, 5]
+    # 6. Image tab content [2]
     _columns_calls = iter(
         [
             (col1, col_swap, col2),
             (text_left_col, text_right_col),
             (text_clear_col, text_count_col),
+            (text_spacer_col, text_copy_col, text_download_col),
             (col1, col_swap, col2),
             (img_left_col, img_right_col),
         ]
@@ -61,9 +68,17 @@ def app_module():
     mock_torch = MagicMock()
     mock_dotenv = MagicMock()
     mock_transformers = MagicMock()
+    mock_components_v1 = MagicMock()
+    mock_components = MagicMock()
+    mock_components.v1 = mock_components_v1
+    mock_components.__path__ = []
+    mock_st.components = mock_components
+    mock_st.__path__ = []  # make Python treat mock_st as a package
 
     patches = {
         "streamlit": mock_st,
+        "streamlit.components": mock_components,
+        "streamlit.components.v1": mock_components_v1,
         "torch": mock_torch,
         "dotenv": mock_dotenv,
         "transformers": mock_transformers,
