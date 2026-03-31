@@ -132,6 +132,51 @@ class TestSwapLanguages:
         assert mock_state["source_lang"] == "English"
         assert mock_state["target_lang"] == "French"
 
+    def test_swap_copies_translation_to_source_text(self, app_module):
+        result = app_module.TranslationResult(
+            response="hola",
+            prompt_eval_count=10,
+            prompt_eval_duration=100,
+            eval_count=5,
+            eval_duration=200,
+        )
+        mock_state = {
+            "source_lang": "English",
+            "target_lang": "Spanish",
+            "translation_result": result,
+        }
+        with patch.object(app_module.st, "session_state", mock_state):
+            app_module._swap_languages()
+        assert mock_state["source_text"] == "hola"
+        assert "translation_result" not in mock_state
+
+    def test_double_swap_with_translation_is_not_reversible(self, app_module):
+        result = app_module.TranslationResult(
+            response="hola",
+            prompt_eval_count=10,
+            prompt_eval_duration=100,
+            eval_count=5,
+            eval_duration=200,
+        )
+        mock_state = {
+            "source_lang": "English",
+            "target_lang": "Spanish",
+            "translation_result": result,
+        }
+        with patch.object(app_module.st, "session_state", mock_state):
+            app_module._swap_languages()
+            app_module._swap_languages()
+        assert mock_state["source_lang"] == "English"
+        assert mock_state["target_lang"] == "Spanish"
+        assert mock_state["source_text"] == "hola"
+        assert "translation_result" not in mock_state
+
+    def test_swap_without_translation_does_not_set_source_text(self, app_module):
+        mock_state = {"source_lang": "English", "target_lang": "Spanish"}
+        with patch.object(app_module.st, "session_state", mock_state):
+            app_module._swap_languages()
+        assert "source_text" not in mock_state
+
 
 class TestUpdateSource:
     def test_copies_tab_key_to_canonical(self, app_module):

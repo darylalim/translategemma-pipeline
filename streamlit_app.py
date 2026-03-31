@@ -195,6 +195,11 @@ def _swap_languages() -> None:
     tgt = st.session_state["target_lang"]
     st.session_state["source_lang"] = tgt
     st.session_state["target_lang"] = src
+    if "translation_result" in st.session_state:
+        st.session_state["source_text"] = st.session_state[
+            "translation_result"
+        ].response
+        del st.session_state["translation_result"]
 
 
 def _update_source(key: str) -> None:
