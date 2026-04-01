@@ -18,42 +18,35 @@ def app_module():
 
     # Text tab columns
     text_left_col, text_right_col = MagicMock(), MagicMock()
-    text_btn_translate_col, text_btn_clear_col, text_btn_spacer_col = (
-        MagicMock(),
-        MagicMock(),
-        MagicMock(),
-    )
-    text_spacer_col, text_copy_col, text_download_col = (
-        MagicMock(),
-        MagicMock(),
-        MagicMock(),
-    )
+    text_btn_translate_col = MagicMock()
+    text_btn_clear_col = MagicMock()
+    text_btn_spacer_col = MagicMock()
+    text_copy_col = MagicMock()
+    text_download_col = MagicMock()
     # Image tab columns
     img_left_col, img_right_col = MagicMock(), MagicMock()
-    img_spacer_col, img_copy_col, img_download_col = (
-        MagicMock(),
-        MagicMock(),
-        MagicMock(),
-    )
+    img_btn_translate_col = MagicMock()
+    img_btn_spacer1_col = MagicMock()
+    img_btn_spacer2_col = MagicMock()
+    img_copy_col = MagicMock()
+    img_download_col = MagicMock()
 
     # Column calls are position-dependent — update this list if st.columns
     # calls are added, removed, or reordered in streamlit_app.py:
     # 1. Text tab language selectors [10, 1, 10]
     # 2. Text tab content [2]
-    # 3. Text tab translate/clear buttons [3, 1, 6]
-    # 4. Text tab copy/download [18, 1, 1]
-    # 5. Image tab language selectors [10, 1, 10]
-    # 6. Image tab content [2]
-    # 7. Image tab copy/download [18, 1, 1]
+    # 3. Text tab translate/clear/copy/download [3, 1, 14, 1, 1]
+    # 4. Image tab language selectors [10, 1, 10]
+    # 5. Image tab content [2]
+    # 6. Image tab translate/copy/download [3, 1, 14, 1, 1]
     _columns_calls = iter(
         [
             (col1, col_swap, col2),
             (text_left_col, text_right_col),
-            (text_btn_translate_col, text_btn_clear_col, text_btn_spacer_col),
-            (text_spacer_col, text_copy_col, text_download_col),
+            (text_btn_translate_col, text_btn_clear_col, text_btn_spacer_col, text_copy_col, text_download_col),
             (col1, col_swap, col2),
             (img_left_col, img_right_col),
-            (img_spacer_col, img_copy_col, img_download_col),
+            (img_btn_translate_col, img_btn_spacer1_col, img_btn_spacer2_col, img_copy_col, img_download_col),
         ]
     )
 

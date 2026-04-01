@@ -9,7 +9,7 @@ class TestConstants:
         assert app_module.MAX_NEW_TOKENS == 512
 
     def test_accepted_image_types(self, app_module):
-        assert app_module.ACCEPTED_IMAGE_TYPES == ["png", "jpg", "jpeg", "webp"]
+        assert app_module.ACCEPTED_IMAGE_TYPES == ["jpg", "jpeg", "png", "webp"]
 
 
 class TestLanguageConfiguration:
