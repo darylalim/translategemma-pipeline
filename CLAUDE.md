@@ -61,7 +61,7 @@ All languages are bidirectional with English: Chinese (zh), Dutch (nl), French (
 
 Input images are normalized to 896x896 resolution and encoded to 256 tokens each. Total input context is 2000 tokens.
 
-Accepted image types: PNG, JPG, JPEG, WEBP.
+Accepted image types: JPG, JPEG, PNG, WEBP.
 
 ### UI
 
@@ -71,11 +71,9 @@ Accepted image types: PNG, JPG, JPEG, WEBP.
 - Swap button moves translation output to source input and clears the result
 - Text tab: 2-column side-by-side; `st.text_area` (no placeholder, `max_chars=5000`, height 300) for input, disabled `st.text_area` (placeholder "Translation", height 300) for output
 - Output text areas use `st.session_state` to set value (not the `value` parameter) to avoid stale widget state
-- Below text input: translate button (primary, left) and clear button (`:material/close:`, right) on same row `[3, 1, 6]`
-- Below text/image output: copy button (`:material/content_copy:`), download button (`:material/download:`), right-aligned `[18, 1, 1]`
+- Image tab: `st.file_uploader` (label hidden via `label_visibility="collapsed"`) + `st.image` preview (left), disabled `st.text_area` output (right)
+- Both tabs: full-width button row `[3, 1, 14, 1, 1]` below content columns — translate button (primary, left), clear button (`:material/close:`, text tab only), copy button (`:material/content_copy:`), download button (`:material/download:`, right-aligned)
 - All icon buttons use `type="tertiary"` (no outline) with tooltip via `help`
-- Image tab: `st.file_uploader` + caption for supported types + `st.image` preview (left), disabled `st.text_area` output (right)
-- Translate button: primary, left-aligned (both tabs)
 - Copy uses `streamlit.components.v1.html` with JS clipboard API
 - Download uses `st.download_button` with `mime="text/plain"`
 - `st.session_state` keys: `source_lang`, `target_lang`, `translation_result`, `image_translation_result`, `source_text`, `text_output`, `image_output`
