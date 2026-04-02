@@ -63,10 +63,7 @@ def translate(
     result = generate(model, tokenizer, prompt=prompt, max_tokens=MAX_NEW_TOKENS)
     # Strip <end_of_turn> and any trailing garbage — the manual prompt
     # doesn't let mlx_lm know to stop at the end-of-turn token.
-    end_token = "<end_of_turn>"
-    if end_token in result:
-        result = result[: result.index(end_token)]
-    return result.strip()
+    return result.split("<end_of_turn>", 1)[0].strip()
 
 
 st.set_page_config(page_title="TranslateGemma Translate", page_icon="\U0001f310")
