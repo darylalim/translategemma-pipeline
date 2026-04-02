@@ -84,13 +84,10 @@ except Exception as e:
 
 
 def _swap_languages() -> None:
-    src = st.session_state["source_lang"]
-    tgt = st.session_state["target_lang"]
-    st.session_state["source_lang"] = tgt
-    st.session_state["target_lang"] = src
-    if "translation_result" in st.session_state:
-        st.session_state["source_text"] = st.session_state["translation_result"]
-        del st.session_state["translation_result"]
+    state = st.session_state
+    state["source_lang"], state["target_lang"] = state["target_lang"], state["source_lang"]
+    if "translation_result" in state:
+        state["source_text"] = state.pop("translation_result")
 
 
 # --- Language selectors ---
