@@ -1,11 +1,10 @@
 # TranslateGemma Translate
 
-Streamlit app for translating text and images using Google's [TranslateGemma 4B](https://huggingface.co/google/translategemma-4b-it) model with local GPU inference.
+Streamlit app for translating text using [TranslateGemma 4B 8-bit](https://huggingface.co/mlx-community/translategemma-4b-it-8bit) with Apple Silicon inference via MLX.
 
 ## Features
 
 - **Text translation** — translate text between supported languages (up to 5,000 characters)
-- **Image translation** — extract and translate text from uploaded images (JPG, JPEG, PNG, WEBP)
 - **Swap languages** — swap source and target languages, moving translation output to source input
 - **Copy to clipboard** — copy translation output with one click
 - **Download as text** — download translation output as a `.txt` file
@@ -17,7 +16,7 @@ Chinese, Dutch, French, German, Indonesian, Italian, Spanish, Vietnamese — all
 ## Requirements
 
 - Python 3.12+
-- GPU with CUDA or Apple Silicon MPS (~8GB VRAM)
+- Apple Silicon Mac (M-series)
 
 ## Setup
 
@@ -27,13 +26,7 @@ Chinese, Dutch, French, German, Indonesian, Italian, Spanish, Vietnamese — all
    uv sync
    ```
 
-2. Add your [Hugging Face token](https://huggingface.co/settings/tokens) to `.env`:
-
-   ```
-   HF_TOKEN=your_token_here
-   ```
-
-3. Run the application:
+2. Run the application:
 
    ```bash
    uv run streamlit run streamlit_app.py
