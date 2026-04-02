@@ -37,7 +37,7 @@ All languages are bidirectional with English: Chinese (zh), Dutch (nl), French (
 
 ### Translation
 
-`translate(text, src_lang, src_code, tgt_lang, tgt_code)` builds the prompt, loads the model, and runs `mlx_lm.generate()`. Returns a `str` — the translated text.
+`translate(text, src_lang, src_code, tgt_lang, tgt_code)` builds the prompt, loads the model, and runs `mlx_lm.generate()`. Returns a `str` — the translated text. `MAX_NEW_TOKENS` (512) limits the maximum output length.
 
 ### UI
 
