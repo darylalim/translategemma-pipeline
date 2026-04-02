@@ -37,7 +37,7 @@ All languages are bidirectional with English: Chinese (zh), Dutch (nl), French (
 
 ### Translation
 
-`translate(text, src_lang, src_code, tgt_lang, tgt_code)` builds the prompt, loads the model, and runs `mlx_lm.generate()`. Returns a `str` — the translated text. `MAX_NEW_TOKENS` (512) limits the maximum output length.
+`translate(text, src_lang, src_code, tgt_lang, tgt_code)` builds the prompt, loads the model, and runs `mlx_lm.generate()`. Strips `<end_of_turn>` and any trailing content from the result. Returns a `str` — the translated text. `MAX_NEW_TOKENS` (512) limits the maximum output length.
 
 ### UI
 
@@ -60,6 +60,10 @@ Fails at runtime for TranslateGemma text translation. Manually construct the pro
 ```python
 prompt = f"<start_of_turn>user\n{instruction}<end_of_turn>\n<start_of_turn>model\n"
 ```
+
+### Strip `<end_of_turn>` from model output
+
+The manual prompt does not let `mlx_lm.generate()` know to stop at the end-of-turn token. The model repeats `<end_of_turn>` indefinitely until `MAX_NEW_TOKENS` is reached. `translate()` strips the first `<end_of_turn>` and everything after it.
 
 ### Use `zh` not `zh-CN` for Chinese
 
