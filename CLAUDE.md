@@ -33,11 +33,11 @@ All languages are bidirectional with English: Chinese (zh), Dutch (nl), French (
 
 ### Model Loading
 
-`load_model()` returns `(model, tokenizer)`. Cached with `@st.cache_resource`. Uses `mlx_lm.load()`.
+`load_model()` returns `(model, tokenizer)`. Cached with `@st.cache_resource`. Uses `mlx_lm.load()`. Registers `<end_of_turn>` as an EOS token via `tokenizer.add_eos_token()` so generation stops early instead of running to `MAX_NEW_TOKENS`.
 
 ### Translation
 
-`translate(text, src_lang, src_code, tgt_lang, tgt_code)` builds the prompt, loads the model, and runs `mlx_lm.generate()`. Splits on `<end_of_turn>` to strip the token and any trailing content. Returns a `str` — the translated text. `MAX_NEW_TOKENS` (512) limits the maximum output length.
+`translate(text, src_lang, src_code, tgt_lang, tgt_code)` builds the prompt, loads the model, and runs `mlx_lm.generate()`. Generation stops at `<end_of_turn>` via the registered EOS token. A safety-net split on `<end_of_turn>` strips the token if it leaks into the output string. Returns a `str` — the translated text. `MAX_NEW_TOKENS` (512) limits the maximum output length.
 
 ### UI
 
@@ -63,7 +63,7 @@ prompt = f"<start_of_turn>user\n{instruction}<end_of_turn>\n<start_of_turn>model
 
 ### Strip `<end_of_turn>` from model output
 
-The manual prompt does not let `mlx_lm.generate()` know to stop at the end-of-turn token. The model repeats `<end_of_turn>` indefinitely until `MAX_NEW_TOKENS` is reached. `translate()` splits on the first `<end_of_turn>` and takes only the text before it.
+`load_model()` registers `<end_of_turn>` as an EOS token so generation stops early. The `translate()` split on `<end_of_turn>` is kept as a safety net in case the token leaks into the output string.
 
 ### Use `zh` not `zh-CN` for Chinese
 
