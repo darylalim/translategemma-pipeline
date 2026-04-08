@@ -48,7 +48,9 @@ def build_prompt(
 
 @st.cache_resource
 def load_model() -> tuple[Any, Any]:
-    return load(MODEL_ID)  # type: ignore[return-value]
+    model, tokenizer = load(MODEL_ID)
+    tokenizer.add_eos_token("<end_of_turn>")
+    return model, tokenizer
 
 
 def translate(
@@ -61,8 +63,8 @@ def translate(
     prompt = build_prompt(text, src_lang, src_code, tgt_lang, tgt_code)
     model, tokenizer = load_model()
     result = generate(model, tokenizer, prompt=prompt, max_tokens=MAX_NEW_TOKENS)
-    # Strip <end_of_turn> and any trailing garbage — the manual prompt
-    # doesn't let mlx_lm know to stop at the end-of-turn token.
+    # Safety net: strip <end_of_turn> and any trailing content in case
+    # the token leaks into the decoded output string.
     return result.split("<end_of_turn>", 1)[0].strip()
 
 
