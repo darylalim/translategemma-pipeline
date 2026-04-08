@@ -136,7 +136,7 @@ with left_col:
         label_visibility="collapsed",
     )
 
-    btn_translate_col, btn_clear_col = st.columns([3, 1])
+    btn_translate_col, _, btn_clear_col = st.columns([3, 2, 1])
     with btn_translate_col:
         translate_clicked = st.button(
             "Translate",
@@ -145,7 +145,7 @@ with left_col:
         )
     with btn_clear_col:
         if st.button(
-            ":material/close:",
+            "Clear",
             type="tertiary",
             help="Clear source text",
             key="clear_text",
@@ -167,10 +167,10 @@ with right_col:
         key="text_output",
     )
 
-    copy_col, download_col = st.columns([1, 1])
+    copy_col, _, download_col = st.columns([1, 4, 1])
     with copy_col:
         if st.button(
-            ":material/content_copy:",
+            "Copy",
             type="tertiary",
             help="Copy translation",
             key="copy_text",
@@ -195,7 +195,7 @@ with right_col:
     with download_col:
         if prev_response:
             st.download_button(
-                label=":material/download:",
+                label="Download",
                 type="tertiary",
                 help="Download translation",
                 data=prev_response,
