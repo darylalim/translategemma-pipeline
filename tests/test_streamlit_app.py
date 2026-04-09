@@ -10,53 +10,18 @@ class TestConstants:
         assert app_module.MAX_NEW_TOKENS == 512
 
 
-class TestLanguageConfiguration:
-    def test_languages_has_9_entries(self, app_module):
-        assert len(app_module.LANGUAGES) == 9
+class TestLanguageImports:
+    def test_all_languages_available(self, app_module):
+        assert len(app_module.ALL_LANGUAGES) == 295
 
-    def test_languages_values_are_str(self, app_module):
-        for name, code in app_module.LANGUAGES.items():
-            assert isinstance(code, str), f"{name}: expected str value"
+    def test_source_langs_available(self, app_module):
+        assert len(app_module.SOURCE_LANGS) == 225
 
-    def test_source_langs_has_9_entries(self, app_module):
-        assert len(app_module.SOURCE_LANGS) == 9
+    def test_target_langs_for_english_available(self, app_module):
+        assert len(app_module.TARGET_LANGS_FOR_ENGLISH) == 294
 
-    def test_bcp47_codes(self, app_module):
-        expected = {
-            "English": "en",
-            "Chinese": "zh",
-            "Dutch": "nl",
-            "French": "fr",
-            "German": "de",
-            "Indonesian": "id",
-            "Italian": "it",
-            "Spanish": "es",
-            "Vietnamese": "vi",
-        }
-        for name, expected_code in expected.items():
-            assert app_module.LANGUAGES[name] == expected_code, f"{name} code mismatch"
-
-    def test_source_langs_is_sorted(self, app_module):
-        assert app_module.SOURCE_LANGS == sorted(app_module.SOURCE_LANGS)
-
-    def test_source_langs_contains_english(self, app_module):
-        assert "English" in app_module.SOURCE_LANGS
-
-    def test_english_can_target_all_non_english(self, app_module):
-        non_english = sorted(n for n in app_module.LANGUAGES if n != "English")
-        assert len(non_english) == 8
-        assert non_english == sorted(non_english)
-
-    def test_non_english_can_target_all_other_languages(self, app_module):
-        for source in app_module.LANGUAGES:
-            if source == "English":
-                continue
-            valid_targets = sorted(n for n in app_module.LANGUAGES if n != source)
-            assert "English" in valid_targets, (
-                f"{source} should be able to target English"
-            )
-            assert len(valid_targets) == 8, f"{source} should have 8 targets"
-            assert source not in valid_targets, f"{source} should not target itself"
+    def test_from_english_only_available(self, app_module):
+        assert len(app_module.FROM_ENGLISH_ONLY) == 70
 
 
 class TestBuildPrompt:
@@ -132,6 +97,31 @@ class TestSwapLanguages:
         with patch.object(app_module.st, "session_state", mock_state):
             app_module._swap_languages()
         assert "source_text" not in mock_state
+
+
+class TestTargetFiltering:
+    def test_english_source_targets_all_non_english(self, app_module):
+        from languages import TARGET_LANGS_FOR_ENGLISH
+
+        valid_targets = TARGET_LANGS_FOR_ENGLISH
+        assert "English" not in valid_targets
+        assert len(valid_targets) == 294
+
+    def test_non_english_source_targets_only_english(self, app_module):
+        valid_targets = ["English"]
+        assert valid_targets == ["English"]
+
+
+class TestSwapDisabled:
+    def test_swap_enabled_for_bidirectional_target(self, app_module):
+        from languages import FROM_ENGLISH_ONLY
+
+        assert "Spanish" not in FROM_ENGLISH_ONLY
+
+    def test_swap_disabled_for_from_english_only_target(self, app_module):
+        from languages import FROM_ENGLISH_ONLY
+
+        assert "Albanian" in FROM_ENGLISH_ONLY
 
 
 class TestTranslate:

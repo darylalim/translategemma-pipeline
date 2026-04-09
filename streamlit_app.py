@@ -6,26 +6,19 @@ import streamlit as st
 import streamlit.components.v1 as components
 from mlx_lm import generate, load
 
+from languages import (
+    ALL_LANGUAGES,
+    FROM_ENGLISH_ONLY,
+    SOURCE_LANGS,
+    TARGET_LANGS_FOR_ENGLISH,
+)
+
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 MODEL_ID = "mlx-community/translategemma-4b-it-8bit"
 MAX_NEW_TOKENS = 512
-
-LANGUAGES: dict[str, str] = {
-    "English": "en",
-    "Chinese": "zh",
-    "Dutch": "nl",
-    "French": "fr",
-    "German": "de",
-    "Indonesian": "id",
-    "Italian": "it",
-    "Spanish": "es",
-    "Vietnamese": "vi",
-}
-
-SOURCE_LANGS: list[str] = sorted(LANGUAGES.keys())
 
 
 def build_prompt(
@@ -104,7 +97,10 @@ source = col1.selectbox(
     label_visibility="collapsed",
 )
 
-valid_targets = sorted(n for n in LANGUAGES if n != source)
+if source == "English":
+    valid_targets = TARGET_LANGS_FOR_ENGLISH
+else:
+    valid_targets = ["English"]
 if st.session_state["target_lang"] not in valid_targets:
     st.session_state["target_lang"] = valid_targets[0]
 
@@ -116,12 +112,14 @@ target = col2.selectbox(
 )
 
 with col_swap:
+    can_swap = st.session_state["target_lang"] not in FROM_ENGLISH_ONLY
     st.button(
         ":material/swap_horiz:",
         type="tertiary",
         use_container_width=True,
         on_click=_swap_languages,
         help="Swap languages",
+        disabled=not can_swap,
     )
 
 # --- Text areas and buttons ---
@@ -201,9 +199,9 @@ if translate_clicked:
             result = translate(
                 text,
                 source,
-                LANGUAGES[source],
+                ALL_LANGUAGES[source],
                 target,
-                LANGUAGES[target],
+                ALL_LANGUAGES[target],
             )
             st.session_state["translation_result"] = result
             st.rerun()
