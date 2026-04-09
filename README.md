@@ -11,7 +11,10 @@ Streamlit app for translating text using [TranslateGemma 4B 8-bit](https://huggi
 
 ## Supported Languages
 
-Chinese, Dutch, French, German, Indonesian, Italian, Spanish, Vietnamese — all bidirectional with English.
+295 languages from the [TranslateGemma Technical Report](https://arxiv.org/pdf/2601.09012):
+
+- **225 bidirectional** — paired with English in both directions (e.g., French, Japanese, Swahili)
+- **70 from-English-only** — can only receive translations from English (e.g., Albanian, Finnish, Tamil)
 
 ## Requirements
 
